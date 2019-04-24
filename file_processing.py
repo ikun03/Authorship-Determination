@@ -1,18 +1,23 @@
 import operator
 import re
 import nltk
+from nltk.corpus import stopwords
+
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
+nltk.download('stopwords')
+
 
 def process(fileName):
     print("**************** Processing file: " + fileName + "****************")
     file = open(fileName, "r")
+    sentences = nltk.sent_tokenize(file.read())
     wordDictionary = {}
     operandDictionary = {}
     hyphenatedWordsDictionary = {}
     lineCount = 0
     partSpeechDict = {}
-    for line in file:
+    for line in sentences:
         lineCount += 1
         wordsList = re.findall("[A-Za-z]+-[A-Za-z]+|[A-Za-z]+", line)
         operandsList = re.findall("[^A-Za-z\s]", line)
@@ -27,16 +32,16 @@ def process(fileName):
                 partSpeechDict[key] = 1
 
         for word in wordsList:
-            if word in wordDictionary.keys():
-                wordDictionary[word] = wordDictionary[word] + 1
+            if word.lower() in wordDictionary.keys():
+                wordDictionary[word.lower()] = wordDictionary[word.lower()] + 1
             else:
-                wordDictionary[word] = 1
+                wordDictionary[word.lower()] = 1
 
         for hyp in hyphenatedWordsList:
-            if hyp in hyphenatedWordsDictionary.keys():
-                hyphenatedWordsDictionary[hyp] = hyphenatedWordsDictionary[hyp] + 1
+            if hyp.lower() in hyphenatedWordsDictionary.keys():
+                hyphenatedWordsDictionary[hyp.lower()] = hyphenatedWordsDictionary[hyp.lower()] + 1
             else:
-                hyphenatedWordsDictionary[hyp] = 1
+                hyphenatedWordsDictionary[hyp.lower()] = 1
 
         for operand in operandsList:
             if operand in operandDictionary.keys():
@@ -48,7 +53,7 @@ def process(fileName):
     sorted_operand_dictionary = sorted(operandDictionary.items(), key=lambda kv: kv[1], reverse=True)
     sorted_part_dictionary = sorted(partSpeechDict.items(), key=lambda kv: kv[1], reverse=True)
 
-    bannedList = []
+    bannedList = set(stopwords.words('english'))
 
     sorted_word_dictionary_copy = sorted_word_dictionary.copy()
     for i in range(0, len(sorted_word_dictionary_copy)):
@@ -67,6 +72,16 @@ def process(fileName):
     print("Median word length: " + str(len(median_tuple[0])))
     print("Median word : " + median_tuple[0])
 
+    sorted_sentences = sorted(sentences, key=len)
+    median_sorted_sentence = sorted_sentences[len(sorted_sentences) // 2]
+    print("Median Sorted Sentence: " + str(median_sorted_sentence))
+    print("Median sentence length: " + str(len(median_sorted_sentence)))
+    mean_length_sentence = 0
+    for sentence in sorted_sentences:
+        mean_length_sentence += len(sentence)
+    print("Mean Sentence length: " + str(mean_length_sentence // len(sorted_sentences)))
+
+    mean_word_dictionary = sorted(wordDictionary.items(), key=lambda kv: len(kv[0]))
     mean = 0
     for word in mean_word_dictionary:
         mean += len(word[0])
