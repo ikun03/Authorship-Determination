@@ -1,4 +1,4 @@
-import decision_tree_helper
+import decision_tree_helper as dth
 
 
 def calculate_threshold(data, i, labels):
@@ -27,26 +27,31 @@ def calculate_threshold(data, i, labels):
                 list1.append(value)
             else:
                 list2.append(value)
-            entropy_2 = decision_tree_helper.entropy(labels, list2)
-            entropy_1 = decision_tree_helper.entropy(labels, list1)
+            entropy_2 = dth.entropy(labels, list2)
+            entropy_1 = dth.entropy(labels, list1)
             step_entropy.append(
                 max(entropy_1, entropy_2))
     step_entropy.sort()
     return step_entropy[0]
 
 
+def process_tree_node(decision_tree):
+    pass
+
+
 class DecisionTree:
     class Node:
-        __slots__ = "values", "left", "right", "stumps", "attribute_index", "threshold", "data_label"
+        __slots__ = "values", "left", "right", "stumps", "attribute_index", "threshold", "data_labels", "attrib_thresholds"
 
-        def __init__(self, values, stumps, attribute_index, threshold):
+        def __init__(self, values, stumps, attribute_index, threshold, attribute_thresholds):
             self.values = values
             self.stumps = stumps
             self.left = []
             self.right = []
             self.attribute_index = attribute_index
             self.threshold = threshold
-            self.data_label = ""
+            self.data_labels = ""
+            self.attrib_thresholds = attribute_thresholds
 
         def append_to_left(self, element):
             self.left.append(element)
@@ -58,6 +63,26 @@ class DecisionTree:
 
     def __init__(self, data, labels):
         self.data = data
+        # Calculate thresholds
         attribute_threshold = {}
         for i in range(1, len(data[0])):
             attribute_threshold[i] = calculate_threshold(data, i, labels)
+        max_info_gain = [0, 0]
+
+        # Get the attribute with max info gain that shall be our root
+        for att_ind in range(1, len(data[0])):
+            info_gain = dth.information_gain(data, labels, att_ind, attribute_threshold[att_ind])
+            if info_gain > max_info_gain[1]:
+                max_info_gain[0] = att_ind
+                max_info_gain[1] = info_gain
+
+        # Get the stumps that the child will get
+        stumps = []
+        for att_ind in range(1, len(data[0])):
+            if max_info_gain[0] != att_ind:
+                stumps.append(att_ind)
+
+        # Creating the root node
+        decision_tree = DecisionTree.Node(data, stumps, max_info_gain[0], attribute_threshold[max_info_gain[0]],
+                                          attribute_threshold)
+        process_tree_node(decision_tree)
