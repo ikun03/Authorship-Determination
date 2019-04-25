@@ -34,7 +34,7 @@ def entropy(labels, main_list):
     for ind in range(len(main_list)):
         value_ind = labels.index(main_list[ind][0])
         label_list[value_ind].append(ind)
-    entropy_parent = 0
+    entropy_sum = 0
     for list in label_list:
-        entropy_parent += entropy_prod(len(main_list), len(list))
-    return -1 * entropy_parent
+        entropy_sum += entropy_prod(len(main_list), len(list))
+    return -1 * entropy_sum

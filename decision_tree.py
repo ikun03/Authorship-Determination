@@ -35,43 +35,49 @@ def calculate_threshold(data, i, labels):
     return step_entropy[0]
 
 
-def process_tree_node(decision_tree):
-    pass
+def process_tree_node(decision_tree_node):
+    # Check if entropy is 0 or there are no stumps to pass
+    node_entropy = dth.entropy(decision_tree_node.labels, decision_tree_node.data)
+    if node_entropy == 0:
+        decision_tree_node.FINAL_LABEL = decision_tree_node.labels[0]
+        return
+    if len(decision_tree_node.stumps) == 0:
+        label_dictionary = {}
+        for label in decision_tree_node.labels:
+            label_dictionary[label] = 0
+        for data_point in decision_tree_node.data:
+            label_dictionary[data_point[0]] += 1
+        max_count = 0
+        for label in label_dictionary.keys():
+            val = label_dictionary[label]
+            if val > max_count:
+                max_count = val
+                decision_tree_node.FINAL_LABEL = label
+        return
+    # Split data to node
+    left_node_data = []
+    right_node_data = []
+    for data_point in decision_tree_node.data:
+        if data_point[decision_tree_node.att_index] <= decision_tree_node.threshold:
+            left_node_data.append(data_point)
+        else:
+            right_node_data.append(data_point)
 
 
 class DecisionTree:
-    class Node:
-        __slots__ = "values", "left", "right", "stumps", "attribute_index", "threshold", "data_labels", "attrib_thresholds"
-
-        def __init__(self, values, stumps, attribute_index, threshold, attribute_thresholds):
-            self.values = values
-            self.stumps = stumps
-            self.left = []
-            self.right = []
-            self.attribute_index = attribute_index
-            self.threshold = threshold
-            self.data_labels = ""
-            self.attrib_thresholds = attribute_thresholds
-
-        def append_to_left(self, element):
-            self.left.append(element)
-
-        def append_to_right(self, element):
-            self.right.append(element)
-
     __slots__ = "data", "root"
 
     def __init__(self, data, labels):
         self.data = data
         # Calculate thresholds
-        attribute_threshold = {}
+        threshold_list = {}
         for i in range(1, len(data[0])):
-            attribute_threshold[i] = calculate_threshold(data, i, labels)
+            threshold_list[i] = calculate_threshold(data, i, labels)
         max_info_gain = [0, 0]
 
         # Get the attribute with max info gain that shall be our root
         for att_ind in range(1, len(data[0])):
-            info_gain = dth.information_gain(data, labels, att_ind, attribute_threshold[att_ind])
+            info_gain = dth.information_gain(data, labels, att_ind, threshold_list[att_ind])
             if info_gain > max_info_gain[1]:
                 max_info_gain[0] = att_ind
                 max_info_gain[1] = info_gain
@@ -83,6 +89,26 @@ class DecisionTree:
                 stumps.append(att_ind)
 
         # Creating the root node
-        decision_tree = DecisionTree.Node(data, stumps, max_info_gain[0], attribute_threshold[max_info_gain[0]],
-                                          attribute_threshold)
+        decision_tree = DecisionTree.Node(data, stumps, max_info_gain[0], threshold_list[max_info_gain[0]],
+                                          threshold_list)
         process_tree_node(decision_tree)
+
+    class Node:
+        __slots__ = "data", "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL"
+
+        def __init__(self, values, stumps, attribute_index, threshold, attribute_thresholds):
+            self.data = values
+            self.stumps = stumps
+            self.left = []
+            self.right = []
+            self.att_index = attribute_index
+            self.threshold = threshold
+            self.labels = ""
+            self.threshold_list = attribute_thresholds
+            self.FINAL_LABEL = ""
+
+        def append_to_left(self, element):
+            self.left.append(element)
+
+        def append_to_right(self, element):
+            self.right.append(element)
