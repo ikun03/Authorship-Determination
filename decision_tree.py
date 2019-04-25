@@ -31,8 +31,12 @@ def calculate_threshold(data, i, labels):
             entropy_1 = dth.entropy(labels, list1)
             step_entropy.append(
                 max(entropy_1, entropy_2))
-    step_entropy.sort()
-    return step_entropy[0]
+    min_ind = 0
+    for i in range(len(step_entropy)):
+        if step_entropy[i] < step_entropy[min_ind]:
+            min_ind = i
+
+    return label_means[0] + min_ind * step
 
 
 def process_tree_node(data, decision_tree_node):
@@ -70,7 +74,7 @@ def process_tree_node(data, decision_tree_node):
         if data_point[0] not in left_node_labels:
             left_node_labels.append(data_point[0])
 
-    left_max_info_gain = [0, 0]
+    left_max_info_gain = [0, -1]
     for att_ind in range(1, len(left_node_data[0])):
         info_gain = dth.information_gain(left_node_data, left_node_labels, att_ind,
                                          decision_tree_node.threshold_list[att_ind])
@@ -78,7 +82,8 @@ def process_tree_node(data, decision_tree_node):
             left_max_info_gain[0] = att_ind
             left_max_info_gain[1] = info_gain
     left_node_stumps = decision_tree_node.stumps
-    left_node_stumps.remove(left_max_info_gain[0])
+    if left_max_info_gain[0] in left_node_stumps:
+        left_node_stumps.remove(left_max_info_gain[0])
 
     left_node = DecisionTree.Node(left_node_stumps, left_max_info_gain[0],
                                   decision_tree_node.threshold_list[left_max_info_gain[0]],
@@ -90,11 +95,11 @@ def process_tree_node(data, decision_tree_node):
     # For right node find the stump with max info gain
 
     right_node_labels = []
-    for data_point in right_node_labels:
+    for data_point in right_node_data:
         if data_point[0] not in right_node_labels:
             right_node_labels.append(data_point[0])
 
-    right_max_info_gain = [0, 0]
+    right_max_info_gain = [0, -1]
     for att_ind in range(1, len(right_node_data[0])):
         info_gain = dth.information_gain(right_node_data, right_node_labels, att_ind,
                                          decision_tree_node.threshold_list[att_ind])
@@ -102,7 +107,8 @@ def process_tree_node(data, decision_tree_node):
             right_max_info_gain[0] = att_ind
             right_max_info_gain[1] = info_gain
     right_node_stumps = decision_tree_node.stumps
-    right_node_stumps.remove(right_max_info_gain[0])
+    if right_max_info_gain[0] in right_node_stumps:
+        right_node_stumps.remove(right_max_info_gain[0])
 
     right_node = DecisionTree.Node(right_node_stumps, right_max_info_gain[0],
                                    decision_tree_node.threshold_list[right_max_info_gain[0]],
@@ -115,17 +121,16 @@ def process_tree_node(data, decision_tree_node):
 
 
 class DecisionTree:
-    __slots__ = "data", "root"
+    __slots__ = "tree"
 
     def __init__(self, data, labels):
-        self.data = data
         # Calculate thresholds
         threshold_list = {}
         for i in range(1, len(data[0])):
             threshold_list[i] = calculate_threshold(data, i, labels)
 
         # Get the attribute with max info gain that shall be our root
-        max_info_gain = [0, 0]
+        max_info_gain = [0, -1]
         for att_ind in range(1, len(data[0])):
             info_gain = dth.information_gain(data, labels, att_ind, threshold_list[att_ind])
             if info_gain > max_info_gain[1]:
@@ -142,7 +147,7 @@ class DecisionTree:
         decision_tree = DecisionTree.Node(stumps, max_info_gain[0], threshold_list[max_info_gain[0]],
                                           threshold_list)
         decision_tree.labels = labels
-        process_tree_node(data, decision_tree)
+        self.tree = process_tree_node(data, decision_tree)
 
     class Node:
         __slots__ = "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL"
@@ -162,3 +167,12 @@ class DecisionTree:
 
         def append_to_right(self, element):
             self.right.append(element)
+
+
+data = [["slow", 35, 0.4, 40],
+        ["slow", 35, 0.1, 40],
+        ["fast", 5, 0.4, 150],
+        ["fast", 35, 0.1, 150]]
+labels = ["slow", "fast"]
+tree = DecisionTree(data, labels)
+print("Should be done")

@@ -2,6 +2,8 @@ from math import log2
 
 
 def entropy_prod(total_length, values_length):
+    if total_length == 0:
+        return 0
     ratio = values_length / total_length
     if ratio == 0:
         return 0
