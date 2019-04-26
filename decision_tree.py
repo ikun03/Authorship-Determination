@@ -45,7 +45,10 @@ def process_tree_node(data, decision_tree_node):
     if node_entropy == 0:
         decision_tree_node.FINAL_LABEL = decision_tree_node.labels[0]
         return decision_tree_node
-    if len(decision_tree_node.stumps) == 0 or decision_tree_node.depth == 0:
+    if len(
+            decision_tree_node.stumps) == 0 \
+            or decision_tree_node.depth == 0 \
+            or node_entropy <= decision_tree_node.entropy_cutoff:
         label_dictionary = {}
         for label in decision_tree_node.labels:
             label_dictionary[label] = 0
@@ -88,7 +91,8 @@ def process_tree_node(data, decision_tree_node):
 
     left_node = DecisionTree.Node(left_node_stumps, left_max_info_gain[0],
                                   decision_tree_node.threshold_list[left_max_info_gain[0]],
-                                  decision_tree_node.threshold_list, decision_tree_node.depth - 1)
+                                  decision_tree_node.threshold_list, decision_tree_node.depth - 1,
+                                  decision_tree_node.entropy_cutoff)
     left_node.labels = left_node_labels
     left_node = process_tree_node(left_node_data, left_node)
     decision_tree_node.left = left_node
@@ -114,7 +118,8 @@ def process_tree_node(data, decision_tree_node):
 
     right_node = DecisionTree.Node(right_node_stumps, right_max_info_gain[0],
                                    decision_tree_node.threshold_list[right_max_info_gain[0]],
-                                   decision_tree_node.threshold_list, decision_tree_node.depth - 1)
+                                   decision_tree_node.threshold_list, decision_tree_node.depth - 1,
+                                   decision_tree_node.entropy_cutoff)
     right_node.labels = right_node_labels
     right_node = process_tree_node(right_node_data, right_node)
     decision_tree_node.right = right_node
@@ -125,7 +130,7 @@ def process_tree_node(data, decision_tree_node):
 class DecisionTree:
     __slots__ = "tree"
 
-    def __init__(self, data, labels, max_depth):
+    def __init__(self, data, labels, max_depth, entropy_cutoff=0.0):
         # Calculate thresholds
         threshold_list = {}
         for i in range(1, len(data[0])):
@@ -147,14 +152,14 @@ class DecisionTree:
 
         # Creating the root node
         decision_tree = DecisionTree.Node(stumps, max_info_gain[0], threshold_list[max_info_gain[0]],
-                                          threshold_list, max_depth)
+                                          threshold_list, max_depth, entropy_cutoff)
         decision_tree.labels = labels
         self.tree = process_tree_node(data, decision_tree)
 
     class Node:
-        __slots__ = "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL", "depth"
+        __slots__ = "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL", "depth", "entropy_cutoff"
 
-        def __init__(self, stumps, attribute_index, threshold, attribute_thresholds, depth):
+        def __init__(self, stumps, attribute_index, threshold, attribute_thresholds, depth, entropy_cutoff):
             self.stumps = stumps
             self.left = None
             self.right = None
@@ -164,6 +169,7 @@ class DecisionTree:
             self.threshold_list = attribute_thresholds
             self.FINAL_LABEL = ""
             self.depth = depth
+            self.entropy_cutoff = entropy_cutoff
 
         def append_to_left(self, element):
             self.left.append(element)
