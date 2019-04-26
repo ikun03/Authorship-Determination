@@ -8,7 +8,7 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 
 
-def process(fileName):
+def process(fileName, author):
     print("**************** Processing file: " + fileName + "****************")
     file = open(fileName, "r")
     sentences = nltk.sent_tokenize(file.read())
@@ -105,9 +105,28 @@ def process(fileName):
     print("**************** Ending file process: " + fileName + "****************")
 
 
-process("lost_world.txt")
-process("sherlock.txt")
-process("study_in_scarlet.txt")
-process("moby_dick.txt")
-process("bartleby.txt")
-process("confidence_man.txt")
+data_set = []
+process("lost_world.txt", "ACD")
+process("sherlock.txt", "ACD")
+process("study_in_scarlet.txt", "ACD")
+process("moby_dick.txt", "HM")
+process("bartleby.txt", "HM")
+process("confidence_man.txt", "HM")
+process("pierre.txt", "HM")
+process("white_jacket.txt", "HM")
+process("typee.txt", "HM")
+process("battle_pieces.txt", "HM")
+process("redburn.txt", "HM")
+process("omoo.txt", "HM")
+process("israel_potter.txt", "HM")
+process("my_chimney.txt", "HM")
+process("mardi.txt", "HM")
+process("baskervilles.txt", "ACD")
+process("sing_four.txt", "ACD")
+process("return.txt", "ACD")
+process("memoirs.txt", "ACD")
+process("valley.txt", "ACD")
+process("tales_terror.txt", "ACD")
+process("white_company.txt", "ACD")
+process("last_bow.txt", "ACD")
+process("boer_war", "ACD")
