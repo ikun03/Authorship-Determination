@@ -81,7 +81,8 @@ def process_tree_node(data, decision_tree_node):
         if info_gain > left_max_info_gain[1]:
             left_max_info_gain[0] = att_ind
             left_max_info_gain[1] = info_gain
-    left_node_stumps = decision_tree_node.stumps
+
+    left_node_stumps = decision_tree_node.stumps.copy()
     if left_max_info_gain[0] in left_node_stumps:
         left_node_stumps.remove(left_max_info_gain[0])
 
@@ -106,7 +107,8 @@ def process_tree_node(data, decision_tree_node):
         if info_gain > right_max_info_gain[1]:
             right_max_info_gain[0] = att_ind
             right_max_info_gain[1] = info_gain
-    right_node_stumps = decision_tree_node.stumps
+
+    right_node_stumps = decision_tree_node.stumps.copy()
     if right_max_info_gain[0] in right_node_stumps:
         right_node_stumps.remove(right_max_info_gain[0])
 
