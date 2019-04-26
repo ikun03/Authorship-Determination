@@ -75,7 +75,7 @@ def process_tree_node(data, decision_tree_node):
             left_node_labels.append(data_point[0])
 
     left_max_info_gain = [0, -1]
-    for att_ind in range(1, len(left_node_data[0])):
+    for att_ind in decision_tree_node.stumps:
         info_gain = dth.information_gain(left_node_data, left_node_labels, att_ind,
                                          decision_tree_node.threshold_list[att_ind])
         if info_gain > left_max_info_gain[1]:
@@ -100,7 +100,7 @@ def process_tree_node(data, decision_tree_node):
             right_node_labels.append(data_point[0])
 
     right_max_info_gain = [0, -1]
-    for att_ind in range(1, len(right_node_data[0])):
+    for att_ind in decision_tree_node.stumps:
         info_gain = dth.information_gain(right_node_data, right_node_labels, att_ind,
                                          decision_tree_node.threshold_list[att_ind])
         if info_gain > right_max_info_gain[1]:
