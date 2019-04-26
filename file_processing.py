@@ -8,11 +8,25 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 
 
-def process(fileName, author):
+class TestSet:
+    __slots__ = "data", "author"
+
+    def __init__(self, data, author):
+        self.data = data
+        self.author = author
+
+
+def process(file_name, author):
     dataset_row = [author]
-    print("**************** Processing file: " + fileName + "****************")
-    file = open(fileName, "r")
-    sentences = nltk.sent_tokenize(file.read())
+    print("**************** Processing file: " + file_name + "****************")
+    file = open(file_name, "r")
+    result = process_string(dataset_row, file.read())
+    print("**************** Ending file process: " + file_name + "****************")
+    return result
+
+
+def process_string(dataset_row, book_text):
+    sentences = nltk.sent_tokenize(book_text)
     word_dictionary = {}
     operand_dictionary = {}
     hyphenated_words_dictionary = {}
@@ -49,30 +63,23 @@ def process(fileName, author):
                 operand_dictionary[operand] = operand_dictionary[operand] + 1
             else:
                 operand_dictionary[operand] = 1
-
     sorted_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: kv[1], reverse=True)
     sorted_operand_dictionary = sorted(operand_dictionary.items(), key=lambda kv: kv[1], reverse=True)
     sorted_part_dictionary = sorted(part_speech_dict.items(), key=lambda kv: kv[1], reverse=True)
-
     banned_list = set(stopwords.words('english'))
-
     sorted_word_dictionary_copy = sorted_word_dictionary.copy()
     for i in range(0, len(sorted_word_dictionary_copy)):
         if sorted_word_dictionary_copy[i][0] in banned_list:
             sorted_word_dictionary.remove(sorted_word_dictionary_copy[i])
-
     banned_operands = []
-
     sorted_operand_dictionary_copy = sorted_operand_dictionary.copy()
     for i in range(0, len(sorted_operand_dictionary_copy)):
         if sorted_operand_dictionary_copy[i][0] in banned_operands:
             sorted_operand_dictionary.remove(sorted_operand_dictionary_copy[i])
-
     mean_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: len(kv[0]))
     median_tuple = mean_word_dictionary[len(mean_word_dictionary) // 2]
     print("Median word length: " + str(len(median_tuple[0])))
     print("Median word : " + median_tuple[0])
-
     sorted_sentences = sorted(sentences, key=len)
     median_sorted_sentence = sorted_sentences[len(sorted_sentences) // 2]
     print("Median Sorted Sentence: " + str(median_sorted_sentence))
@@ -81,60 +88,100 @@ def process(fileName, author):
     for sentence in sorted_sentences:
         mean_length_sentence += len(sentence)
     print("Mean Sentence length: " + str(mean_length_sentence // len(sorted_sentences)))
-
     mean_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: len(kv[0]))
     mean = 0
     for word in mean_word_dictionary:
         mean += len(word[0])
     print("Mean word length: " + str(mean // len(mean_word_dictionary)))
-
-    words_file = open(fileName + "word_results.txt", 'w')
-    for tuple in sorted_word_dictionary:
-        words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
-
-    words_file = open(fileName + "operand_results.txt", 'w')
-    for tuple in sorted_operand_dictionary:
-        words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
-
-    words_file = open(fileName + "parts_of_speech_result.txt", 'w')
-    for tuple in sorted_part_dictionary:
-        words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
-
+    # words_file = open(fileName + "word_results.txt", 'w')
+    # for tuple in sorted_word_dictionary:
+    #     words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
+    #
+    # words_file = open(fileName + "operand_results.txt", 'w')
+    # for tuple in sorted_operand_dictionary:
+    #     words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
+    #
+    # words_file = open(fileName + "parts_of_speech_result.txt", 'w')
+    # for tuple in sorted_part_dictionary:
+    #     words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
     hyp_word_count = len(hyphenated_words_dictionary.keys())
     print("hyphenated words : " + str(hyp_word_count) + " : " + str(round(hyp_word_count / line_count, 4)))
 
-    print("**************** Ending file process: " + fileName + "****************")
-    dataset_row.append(round(operand_dictionary[";"] / line_count, 4))
-    dataset_row.append(round(operand_dictionary[","] / line_count, 4))
-    dataset_row.append(round(part_speech_dict["RB"] / line_count, 4))
+    # Appending data to the row
+    if ";" in operand_dictionary.keys():
+        dataset_row.append(round(operand_dictionary[";"] / line_count, 4))
+    else:
+        dataset_row.append(0)
+
+    if "," in operand_dictionary.keys():
+        dataset_row.append(round(operand_dictionary[","] / line_count, 4))
+    else:
+        dataset_row.append(0)
+
+    if "RB" in part_speech_dict.keys():
+        dataset_row.append(round(part_speech_dict["RB"] / line_count, 4))
+    else:
+        dataset_row.append(0)
+
     dataset_row.append(round(mean_length_sentence / len(sorted_sentences), 4))
-    dataset_row.append(round(operand_dictionary["?"] / line_count, 4))
+
+    if "upon" in word_dictionary.keys():
+        dataset_row.append(round(word_dictionary["upon"] / line_count, 4))
+    else:
+        dataset_row.append(0)
     return dataset_row
 
 
-data_set = []
-data_set.append(process("lost_world.txt", "ACD"))
-data_set.append(process("sherlock.txt", "ACD"))
-data_set.append(process("study_in_scarlet.txt", "ACD"))
-data_set.append(process("moby_dick.txt", "HM"))
-data_set.append(process("bartleby.txt", "HM"))
-data_set.append(process("confidence_man.txt", "HM"))
-data_set.append(process("pierre.txt", "HM"))
-data_set.append(process("white_jacket.txt", "HM"))
-data_set.append(process("typee.txt", "HM"))
-data_set.append(process("battle_pieces.txt", "HM"))
-data_set.append(process("redburn.txt", "HM"))
-data_set.append(process("omoo.txt", "HM"))
-data_set.append(process("israel_potter.txt", "HM"))
-data_set.append(process("my_chimney.txt", "HM"))
-data_set.append(process("mardi.txt", "HM"))
-data_set.append(process("baskervilles.txt", "ACD"))
-data_set.append(process("sign_four.txt", "ACD"))
-data_set.append(process("return.txt", "ACD"))
-data_set.append(process("memoirs.txt", "ACD"))
-data_set.append(process("valley.txt", "ACD"))
-data_set.append(process("tales_terror.txt", "ACD"))
-data_set.append(process("white_company.txt", "ACD"))
-data_set.append(process("last_bow.txt", "ACD"))
-data_set.append(process("boer_war.txt", "ACD"))
-print(data_set)
+#
+# data_set = []
+# # decision tree training set
+# # Arthur Conan Doyle
+# data_set.append(process("lost_world.txt", "ACD"))
+# data_set.append(process("sherlock.txt", "ACD"))
+# data_set.append(process("study_in_scarlet.txt", "ACD"))
+# data_set.append(process("baskervilles.txt", "ACD"))
+# data_set.append(process("sign_four.txt", "ACD"))
+# data_set.append(process("return.txt", "ACD"))
+# data_set.append(process("memoirs.txt", "ACD"))
+# data_set.append(process("valley.txt", "ACD"))
+# data_set.append(process("tales_terror.txt", "ACD"))
+# data_set.append(process("white_company.txt", "ACD"))
+# data_set.append(process("last_bow.txt", "ACD"))
+# data_set.append(process("boer_war.txt", "ACD"))
+#
+# # Herman Melville
+# data_set.append(process("moby_dick.txt", "HM"))
+# data_set.append(process("bartleby.txt", "HM"))
+# data_set.append(process("confidence_man.txt", "HM"))
+# data_set.append(process("pierre.txt", "HM"))
+# data_set.append(process("white_jacket.txt", "HM"))
+# data_set.append(process("typee.txt", "HM"))
+# data_set.append(process("battle_pieces.txt", "HM"))
+# data_set.append(process("redburn.txt", "HM"))
+# data_set.append(process("omoo.txt", "HM"))
+# data_set.append(process("israel_potter.txt", "HM"))
+# data_set.append(process("my_chimney.txt", "HM"))
+# data_set.append(process("mardi.txt", "HM"))
+
+# Decision tree test data
+file = open("test_set_file.txt", "r")
+line = file.readline()
+test_data = []
+for i in range(6):
+    while "**set_start**" not in line:
+        line = file.readline()
+    text_data = ""
+    data_point = TestSet("", file.readline())
+    line = file.readline()
+    line = file.readline()
+
+    while "**set_end**" not in line:
+        text_data += line
+        line = file.readline()
+    data_point.data = text_data
+    test_data.append(data_point)
+
+processed_test_data = []
+for data_point in test_data:
+    processed_test_data.append(process_string([data_point.author], data_point.data))
+print("done")

@@ -45,7 +45,7 @@ def process_tree_node(data, decision_tree_node):
     if node_entropy == 0:
         decision_tree_node.FINAL_LABEL = decision_tree_node.labels[0]
         return decision_tree_node
-    if len(decision_tree_node.stumps) == 0:
+    if len(decision_tree_node.stumps) == 0 or decision_tree_node.depth == 0:
         label_dictionary = {}
         for label in decision_tree_node.labels:
             label_dictionary[label] = 0
@@ -87,7 +87,7 @@ def process_tree_node(data, decision_tree_node):
 
     left_node = DecisionTree.Node(left_node_stumps, left_max_info_gain[0],
                                   decision_tree_node.threshold_list[left_max_info_gain[0]],
-                                  decision_tree_node.threshold_list)
+                                  decision_tree_node.threshold_list, decision_tree_node.depth - 1)
     left_node.labels = left_node_labels
     left_node = process_tree_node(left_node_data, left_node)
     decision_tree_node.left = left_node
@@ -112,7 +112,7 @@ def process_tree_node(data, decision_tree_node):
 
     right_node = DecisionTree.Node(right_node_stumps, right_max_info_gain[0],
                                    decision_tree_node.threshold_list[right_max_info_gain[0]],
-                                   decision_tree_node.threshold_list)
+                                   decision_tree_node.threshold_list, decision_tree_node.depth - 1)
     right_node.labels = right_node_labels
     right_node = process_tree_node(right_node_data, right_node)
     decision_tree_node.right = right_node
@@ -123,7 +123,7 @@ def process_tree_node(data, decision_tree_node):
 class DecisionTree:
     __slots__ = "tree"
 
-    def __init__(self, data, labels):
+    def __init__(self, data, labels, max_depth):
         # Calculate thresholds
         threshold_list = {}
         for i in range(1, len(data[0])):
@@ -145,14 +145,14 @@ class DecisionTree:
 
         # Creating the root node
         decision_tree = DecisionTree.Node(stumps, max_info_gain[0], threshold_list[max_info_gain[0]],
-                                          threshold_list)
+                                          threshold_list, max_depth)
         decision_tree.labels = labels
         self.tree = process_tree_node(data, decision_tree)
 
     class Node:
-        __slots__ = "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL"
+        __slots__ = "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL", "depth"
 
-        def __init__(self, stumps, attribute_index, threshold, attribute_thresholds):
+        def __init__(self, stumps, attribute_index, threshold, attribute_thresholds, depth):
             self.stumps = stumps
             self.left = None
             self.right = None
@@ -161,6 +161,7 @@ class DecisionTree:
             self.labels = ""
             self.threshold_list = attribute_thresholds
             self.FINAL_LABEL = ""
+            self.depth = depth
 
         def append_to_left(self, element):
             self.left.append(element)
@@ -168,11 +169,11 @@ class DecisionTree:
         def append_to_right(self, element):
             self.right.append(element)
 
-
-data = [["slow", 35, 0.4, 40],
-        ["slow", 35, 0.1, 40],
-        ["fast", 5, 0.4, 150],
-        ["fast", 35, 0.1, 150]]
-labels = ["slow", "fast"]
-tree = DecisionTree(data, labels)
-print("Should be done")
+# Decision testing code
+# data = [["slow", 35, 0.4, 40],
+#         ["slow", 35, 0.1, 40],
+#         ["fast", 5, 0.4, 150],
+#         ["fast", 35, 0.1, 150]]
+# labels = ["slow", "fast"]
+# tree = DecisionTree(data, labels, 2)
+# print("Should be done")
