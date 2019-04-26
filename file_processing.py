@@ -1,9 +1,5 @@
-import copy
-import operator
-from random import shuffle
-import decision_tree as dt
-import perceptron as pt
 import re
+
 import nltk
 from nltk.corpus import stopwords
 
@@ -22,10 +18,8 @@ class TestSet:
 
 def process(file_name, author):
     dataset_row = [author]
-    # print("**************** Processing file: " + file_name + "****************")
     file = open(file_name, "r")
     result = process_string(dataset_row, file.read())
-    # print("**************** Ending file process: " + file_name + "****************")
     return result
 
 
@@ -69,7 +63,6 @@ def process_string(dataset_row, book_text):
                 operand_dictionary[operand] = 1
     sorted_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: kv[1], reverse=True)
     sorted_operand_dictionary = sorted(operand_dictionary.items(), key=lambda kv: kv[1], reverse=True)
-    sorted_part_dictionary = sorted(part_speech_dict.items(), key=lambda kv: kv[1], reverse=True)
     banned_list = set(stopwords.words('english'))
     sorted_word_dictionary_copy = sorted_word_dictionary.copy()
     for i in range(0, len(sorted_word_dictionary_copy)):
@@ -80,37 +73,17 @@ def process_string(dataset_row, book_text):
     for i in range(0, len(sorted_operand_dictionary_copy)):
         if sorted_operand_dictionary_copy[i][0] in banned_operands:
             sorted_operand_dictionary.remove(sorted_operand_dictionary_copy[i])
-    mean_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: len(kv[0]))
-    median_tuple = mean_word_dictionary[len(mean_word_dictionary) // 2]
-    # print("Median word length: " + str(len(median_tuple[0])))
-    # print("Median word : " + median_tuple[0])
+
     sorted_sentences = sorted(sentences, key=len)
-    median_sorted_sentence = sorted_sentences[len(sorted_sentences) // 2]
-    # print("Median Sorted Sentence: " + str(median_sorted_sentence))
-    # print("Median sentence length: " + str(len(median_sorted_sentence)))
     mean_length_sentence = 0
     for sentence in sorted_sentences:
         mean_length_sentence += len(sentence)
-    # print("Mean Sentence length: " + str(mean_length_sentence // len(sorted_sentences)))
+
     mean_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: len(kv[0]))
     mean = 0
     for word in mean_word_dictionary:
         mean += len(word[0])
-    # print("Mean word length: " + str(mean // len(mean_word_dictionary)))
-    # words_file = open(fileName + "word_results.txt", 'w')
-    # for tuple in sorted_word_dictionary:
-    #     words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
-    #
-    # words_file = open(fileName + "operand_results.txt", 'w')
-    # for tuple in sorted_operand_dictionary:
-    #     words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
-    #
-    # words_file = open(fileName + "parts_of_speech_result.txt", 'w')
-    # for tuple in sorted_part_dictionary:
-    #     words_file.write(tuple[0] + " : " + str(tuple[1]) + " : " + str(round(tuple[1] / line_count, 4)) + "\n\n")
-    # hyp_word_count = len(hyphenated_words_dictionary.keys())
-    # print("hyphenated words : " + str(hyp_word_count) + " : " + str(round(hyp_word_count / line_count, 4)))
-    # # Appending data to the row
+
     if ";" in operand_dictionary.keys():
         dataset_row.append(round(operand_dictionary[";"] / line_count, 4))
     else:

@@ -176,12 +176,3 @@ class DecisionTree:
 
         def append_to_right(self, element):
             self.right.append(element)
-
-# Decision testing code
-# data = [["slow", 35, 0.4, 40],
-#         ["slow", 35, 0.1, 40],
-#         ["fast", 5, 0.4, 150],
-#         ["fast", 35, 0.1, 150]]
-# labels = ["slow", "fast"]
-# tree = DecisionTree(data, labels, 2)
-# print("Should be done")
