@@ -32,6 +32,7 @@ def file_main():
                 ['HM', 0.2752, 3.0803, 1.6789, 146.2936, 0.6697, 0.0069, 0, 0],
                 ['HM', 0.4227, 1.6529, 0.8303, 84.3475, 0.4739, 0.0001, 0, 0.0006]]
 
+    # FOR TRAINING DECISION TREE FROM BOOKS UNCOMMENT HERE
     # # decision tree training set
     # data_set = []
     # # Arthur Conan Doyle
@@ -62,7 +63,6 @@ def file_main():
     # data_set.append(process("my_chimney.txt", "HM"))
     # data_set.append(process("mardi.txt", "HM"))
 
-    # Decision tree test data
     shuffle(data_set)
     # Read test data and process it
     file = open("test_set_file.txt", "r")
@@ -74,22 +74,24 @@ def file_main():
     correct_count = 0
     total_count = 0
 
-    # Decision tree classifier usage
-    decision_tree = dt.DecisionTree(data_set, ["HM", "ACD"], 4)
-    shuffle(processed_test_data)
-    for data_point in processed_test_data:
-        total_count += 1
-        node = decision_tree.tree
-        while node.FINAL_LABEL == "":
-            if data_point[node.att_index] <= node.threshold:
-                node = node.left
-            elif data_point[node.att_index] > node.threshold:
-                node = node.right
-        if node.FINAL_LABEL in data_point[0]:
-            correct_count += 1
-    with open("model_decision_tree.pkl", "wb") as output:
-        pickle.dump(decision_tree, output, pickle.HIGHEST_PROTOCOL)
+    # FOR CREATING A DECISION TREE FROM DATA UNCOMMENT HERE
+    # # Decision tree classifier usage
+    # decision_tree = dt.DecisionTree(data_set, ["HM", "ACD"], 4)
+    # shuffle(processed_test_data)
+    # for data_point in processed_test_data:
+    #     total_count += 1
+    #     node = decision_tree.tree
+    #     while node.FINAL_LABEL == "":
+    #         if data_point[node.att_index] <= node.threshold:
+    #             node = node.left
+    #         elif data_point[node.att_index] > node.threshold:
+    #             node = node.right
+    #     if node.FINAL_LABEL in data_point[0]:
+    #         correct_count += 1
+    # with open("model_decision_tree.pkl", "wb") as output:
+    #     pickle.dump(decision_tree, output, pickle.HIGHEST_PROTOCOL)
 
+    # FOR CREATING A PERCEPTRON FROM DATA UNCOMMENT HERE
     # # Perceptron classifier
     # for data_point in data_set:
     #     if "ACD" in data_point[0]:
@@ -114,6 +116,12 @@ def file_main():
 
 
 def get_test_data(file, test_data):
+    """
+    Get the test data from the specially created test file
+    :param file: The test file
+    :param test_data: The test data
+    :return:
+    """
     line = file.readline()
     for i in range(6):
         while "**set_start**" not in line:

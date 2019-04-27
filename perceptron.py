@@ -1,4 +1,10 @@
 def predict(row, weights):
+    """
+    Predict using the given weights
+    :param row: The row for which to make the prediction
+    :param weights: The weights for prediction
+    :return: 1 or 0 depending on threshold
+    """
     threshold = weights[0]
     for i in range(1, len(row)):
         threshold += weights[i] * row[i]
@@ -9,6 +15,13 @@ def predict(row, weights):
 
 
 def train_perceptron(data, learning_rate, epochs):
+    """
+    Train a perceptron
+    :param data: the data for training
+    :param learning_rate: the learning rate for training
+    :param epochs: the number of epochs to use
+    :return: the array of weights
+    """
     weights = []
     for i in range(len(data[0])):
         weights.append(0.0)

@@ -9,6 +9,12 @@ import file_processing as fp
 
 
 def main():
+    """
+    The main function which does the prediction and training process
+    :return: None
+    """
+    # The data set that was created from the books of the authors "ACD" stands for Arthur Conan Doyle and "HM" stands
+    # for Herman Melville
     data_set = [['ACD', 0.0231, 1.157, 0.919, 93.061, 0.3164, 0.0002, 0, 0.0002],
                 ['ACD', 0.0296, 1.1183, 0.9356, 80.9492, 0.1673, 0.0003, 0.0676, 0.0012],
                 ['ACD', 0.0471, 1.3537, 1.0208, 108.7305, 0.2409, 0, 0.0439, 0.0005],
@@ -35,16 +41,19 @@ def main():
                 ['HM', 0.4227, 1.6529, 0.8303, 84.3475, 0.4739, 0.0001, 0, 0.0006]]
 
     if len(sys.argv) > 1:
+        # if neither arguments are given then exit with warning
         if sys.argv[1] != "train" and sys.argv[1] != "predict":
             print("Unknown argument, please enter 'predict' or 'train'")
             sys.exit(1)
 
+        # Train
         elif sys.argv[1] == "train":
             # Train your model
             model = input("Which model would you like to train ? Perceptron(p) or Decision Tree(d): ")
             if model != "p" and model != "d":
                 print("Sorry! Wrong argument")
 
+            # Ask user if they want to use perceptron
             elif model == "p":
                 perceptron_data = copy.deepcopy(data_set)
                 for data_point in perceptron_data:
@@ -64,6 +73,8 @@ def main():
                         print("Author is Arthur Conan Doyle.")
                     elif int(prediction) == 0:
                         print("Author is Herman Melville.")
+
+            # Or a decision tree
             elif model == "d":
                 max_depth = int(input("Please enter the maximum depth of the decision tree: "))
                 entropy_cutoff = float(
@@ -89,7 +100,9 @@ def main():
                     else:
                         print("The author is Herman Melville")
 
+        # Use hard coded models for prediction
         elif sys.argv[1] == "predict":
+            # if user explicitly mentions the need of a decision tree then use a decision tree
             if sys.argv[2] == '-d':
                 with open('model_decision_tree.pkl', 'rb') as model_input:
                     tree = pickle.load(model_input)
@@ -106,6 +119,7 @@ def main():
                     print("The author is Arthur Conan Doyle")
                 else:
                     print("The author is Herman Melville")
+            # Otherwise use a perceptron
             else:
                 filename = sys.argv[2]
                 print("Predicting using the hard-coded perceptron, to predict using the hard-coded decision tree use "
@@ -123,6 +137,7 @@ def main():
                     print("Author is Herman Melville")
 
     else:
+        # Exit if no argument given
         print("Please enter argument 'train' or 'predict'. ")
         sys.exit(1)
 

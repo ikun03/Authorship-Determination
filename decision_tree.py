@@ -2,6 +2,13 @@ import decision_tree_helper as dth
 
 
 def calculate_threshold(data, i, labels):
+    """
+    Calculate thresholds for each attribute to be used in the decision tree
+    :param data: The data to use
+    :param i: The index of the attribute
+    :param labels: The list of labels
+    :return: The threshold for the given attribute
+    """
     labels_dict = {}
     for label in labels:
         labels_dict[label] = 0
@@ -40,6 +47,12 @@ def calculate_threshold(data, i, labels):
 
 
 def process_tree_node(data, decision_tree_node):
+    """
+    Process a node of the decision tree and add children to it
+    :param data: The data to use for processing
+    :param decision_tree_node: The node of the decision tree to process
+    :return: The data set to return
+    """
     # Check if entropy is 0 or there are no stumps to pass
     node_entropy = dth.entropy(decision_tree_node.labels, data)
     if node_entropy == 0:
@@ -128,9 +141,19 @@ def process_tree_node(data, decision_tree_node):
 
 
 class DecisionTree:
+    """
+    The class which creates the decision tree
+    """
     __slots__ = "tree"
 
     def __init__(self, data, labels, max_depth, entropy_cutoff=0.0):
+        """
+        Constructor of the decision tree class
+        :param data: The data for creating the decision tree
+        :param labels: The labels of the data
+        :param max_depth: The maximum depth till which the decision tree can go
+        :param entropy_cutoff: The entropy cutoff of the decision tree
+        """
         # Calculate thresholds
         threshold_list = {}
         for i in range(1, len(data[0])):
@@ -157,6 +180,9 @@ class DecisionTree:
         self.tree = process_tree_node(data, decision_tree)
 
     class Node:
+        """
+        The class to create a single node of the decision tree
+        """
         __slots__ = "left", "right", "stumps", "att_index", "threshold", "labels", "threshold_list", "FINAL_LABEL", "depth", "entropy_cutoff"
 
         def __init__(self, stumps, attribute_index, threshold, attribute_thresholds, depth, entropy_cutoff):

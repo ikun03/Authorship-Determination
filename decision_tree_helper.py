@@ -2,6 +2,12 @@ from math import log2
 
 
 def entropy_prod(total_length, values_length):
+    """
+    Helper function to calculate the product used i n a entropy
+    :param total_length: The total number of values
+    :param values_length: The length of values belonging to class
+    :return: The prodcut for entropy.
+    """
     if total_length == 0:
         return 0
     ratio = values_length / total_length
@@ -11,6 +17,14 @@ def entropy_prod(total_length, values_length):
 
 
 def information_gain(main_list, labels, attribute_index, threshold_value):
+    """
+    Calculate the information gain for a given attribute and threshold value
+    :param main_list: The data
+    :param labels: The labels in the data
+    :param attribute_index: The attribute index
+    :param threshold_value: The threshold value
+    :return: The information gain
+    """
     list1 = []
     list2 = []
     for value in range(0, len(main_list)):
@@ -30,6 +44,12 @@ def information_gain(main_list, labels, attribute_index, threshold_value):
 
 
 def entropy(labels, main_list):
+    """
+    The entropy for a given data and labels
+    :param labels: The labels in the data
+    :param main_list: The entropy of the data
+    :return: The entropy of the data
+    """
     label_list = []
     for i in range(len(labels)):
         label_list.append([])

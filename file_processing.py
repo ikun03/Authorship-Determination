@@ -9,6 +9,10 @@ nltk.download('stopwords')
 
 
 class TestSet:
+    """
+    Object for creating TestSet objects while testing.
+    ONLY NEEDED IF TEST SET FILE IS USED
+    """
     __slots__ = "data", "author"
 
     def __init__(self, data, author):
@@ -17,6 +21,12 @@ class TestSet:
 
 
 def process(file_name, author):
+    """
+    Process the file and return the dataset row
+    :param file_name: The name of the file
+    :param author: The name of the author
+    :return The dataset row
+    """
     dataset_row = [author]
     file = open(file_name, "r")
     result = process_string(dataset_row, file.read())
@@ -24,12 +34,23 @@ def process(file_name, author):
 
 
 def process_string(dataset_row, book_text):
+    """
+    Process a given string and extract features
+    :param dataset_row: The dataset_row in which to add features
+    :param book_text: The text to extract from
+    :return: The row of the dataset
+    """
+    # Tokenize sentences using NLTK
     sentences = nltk.sent_tokenize(book_text)
+
+    # Dictionarys for features
     word_dictionary = {}
     operand_dictionary = {}
     hyphenated_words_dictionary = {}
     line_count = 0
     part_speech_dict = {}
+
+    # For each sentence extract the features
     for line in sentences:
         line_count += 1
         words_list = re.findall("[A-Za-z]+-[A-Za-z]+|[A-Za-z]+", line)
@@ -61,6 +82,7 @@ def process_string(dataset_row, book_text):
                 operand_dictionary[operand] = operand_dictionary[operand] + 1
             else:
                 operand_dictionary[operand] = 1
+    # Sort the dictionaries and do the calculations
     sorted_word_dictionary = sorted(word_dictionary.items(), key=lambda kv: kv[1], reverse=True)
     sorted_operand_dictionary = sorted(operand_dictionary.items(), key=lambda kv: kv[1], reverse=True)
     banned_list = set(stopwords.words('english'))
@@ -84,6 +106,7 @@ def process_string(dataset_row, book_text):
     for word in mean_word_dictionary:
         mean += len(word[0])
 
+    # Get the value of each feature and add it to the row
     if ";" in operand_dictionary.keys():
         dataset_row.append(round(operand_dictionary[";"] / line_count, 4))
     else:
@@ -120,6 +143,5 @@ def process_string(dataset_row, book_text):
         dataset_row.append(round(word_dictionary["ship"] / line_count, 4))
     else:
         dataset_row.append(0)
-
 
     return dataset_row
