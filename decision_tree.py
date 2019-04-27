@@ -56,6 +56,9 @@ def process_tree_node(data, decision_tree_node):
     # Check if entropy is 0 or there are no stumps to pass
     node_entropy = dth.entropy(decision_tree_node.labels, data)
     if node_entropy == 0:
+        if len(decision_tree_node.labels) == 0:
+            decision_tree_node.FINAL_LABEL = ""
+            return decision_tree_node
         decision_tree_node.FINAL_LABEL = decision_tree_node.labels[0]
         return decision_tree_node
     if len(

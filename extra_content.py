@@ -75,19 +75,20 @@ def file_main():
     total_count = 0
 
     # FOR CREATING A DECISION TREE FROM DATA UNCOMMENT HERE
-    # # Decision tree classifier usage
-    # decision_tree = dt.DecisionTree(data_set, ["HM", "ACD"], 4)
-    # shuffle(processed_test_data)
-    # for data_point in processed_test_data:
-    #     total_count += 1
-    #     node = decision_tree.tree
-    #     while node.FINAL_LABEL == "":
-    #         if data_point[node.att_index] <= node.threshold:
-    #             node = node.left
-    #         elif data_point[node.att_index] > node.threshold:
-    #             node = node.right
-    #     if node.FINAL_LABEL in data_point[0]:
-    #         correct_count += 1
+    # Decision tree classifier usage
+    decision_tree = dt.DecisionTree(data_set, ["HM", "ACD"], 1)
+    processed_test_data.extend(data_set)
+    shuffle(processed_test_data)
+    for data_point in processed_test_data:
+        total_count += 1
+        node = decision_tree.tree
+        while node.FINAL_LABEL == "":
+            if data_point[node.att_index] <= node.threshold:
+                node = node.left
+            elif data_point[node.att_index] > node.threshold:
+                node = node.right
+        if node.FINAL_LABEL in data_point[0]:
+            correct_count += 1
     # with open("model_decision_tree.pkl", "wb") as output:
     #     pickle.dump(decision_tree, output, pickle.HIGHEST_PROTOCOL)
 

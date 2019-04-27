@@ -36,6 +36,8 @@ def information_gain(main_list, labels, attribute_index, threshold_value):
     parent_entropy = entropy(labels, main_list)
     list1_entropy = entropy(labels, list1)
     list2_entropy = entropy(labels, list2)
+    if len(main_list) == 0:
+        return 0
     weighted_avg_1 = len(list1) / len(main_list)
     weighted_avg_2 = len(list2) / len(main_list)
     sum_weighted_entropy = (list1_entropy * weighted_avg_1) + (list2_entropy * weighted_avg_2)
