@@ -1,24 +1,25 @@
 import copy
+import pickle
 from random import shuffle
-from file_processing import TestSet, process_string
+from file_processing import TestSet, process_string, process
 import perceptron as pt
 import decision_tree as dt
 
 
 def file_main():
-    data_set = [['ACD', 0.0231, 1.157, 0.919, 93.061, 0.0917], ['ACD', 0.0296, 1.1183, 0.9356, 80.9492, 0.0681],
-                ['ACD', 0.0471, 1.3537, 1.0208, 108.7305, 0.091], ['ACD', 0.0165, 1.2621, 1.1879, 116.3081, 0.1154],
-                ['ACD', 0.0236, 1.117, 0.8673, 77.9446, 0.066], ['ACD', 0.008, 1.413, 1.0474, 102.6556, 0.07],
-                ['ACD', 0.0267, 1.4068, 1.1244, 107.5716, 0.0734], ['ACD', 0.0838, 1.1258, 1.0406, 100.2574, 0.0474],
-                ['ACD', 0.0225, 1.2126, 0.9824, 98.885, 0.0928], ['ACD', 0.0639, 2.1101, 1.2162, 137.5727, 0.159],
-                ['ACD', 0.0021, 0.8333, 0.7004, 68.5042, 0.0464], ['ACD', 0.0208, 1.5963, 1.0204, 142.5501, 0.1329],
-                ['HM', 0.461, 2.1225, 1.5204, 133.2334, 0.0623], ['HM', 0.2118, 1.5373, 1.2326, 99.011, 0.0808],
-                ['HM', 0.2308, 2.3465, 1.3419, 106.459, 0.0548], ['HM', 0.5372, 2.171, 1.8759, 135.6919, 0.0602],
-                ['HM', 0.318, 2.1527, 1.1671, 130.0122, 0.0651], ['HM', 0.2434, 2.3092, 1.6817, 179.5259, 0.1192],
-                ['HM', 0.4191, 1.5634, 0.8894, 117.2704, 0.0265], ['HM', 0.5952, 2.6538, 1.5957, 152.4041, 0.0752],
-                ['HM', 0.3963, 2.0715, 1.2956, 124.8764, 0.094], ['HM', 0.1638, 1.8827, 1.0938, 105.0277, 0.0384],
-                ['HM', 0.2752, 3.0803, 1.6789, 146.2936, 0.0803], ['HM', 0.4227, 1.6529, 0.8303, 84.3475, 0.0399]]
-    # # decision tree training set
+    data_set = [['ACD', 0.0231, 1.157, 0.919, 93.061, 0.3164], ['ACD', 0.0296, 1.1183, 0.9356, 80.9492, 0.1673],
+                ['ACD', 0.0471, 1.3537, 1.0208, 108.7305, 0.2409], ['ACD', 0.0165, 1.2621, 1.1879, 116.3081, 0.2096],
+                ['ACD', 0.0236, 1.117, 0.8673, 77.9446, 0.2274], ['ACD', 0.008, 1.413, 1.0474, 102.6556, 0.2672],
+                ['ACD', 0.0267, 1.4068, 1.1244, 107.5716, 0.2203], ['ACD', 0.0838, 1.1258, 1.0406, 100.2574, 0.2593],
+                ['ACD', 0.0225, 1.2126, 0.9824, 98.885, 0.2537], ['ACD', 0.0639, 2.1101, 1.2162, 137.5727, 0.3374],
+                ['ACD', 0.0021, 0.8333, 0.7004, 68.5042, 0.2152], ['ACD', 0.0208, 1.5963, 1.0204, 142.5501, 0.2363],
+                ['HM', 0.461, 2.1225, 1.5204, 133.2334, 0.2841], ['HM', 0.2118, 1.5373, 1.2326, 99.011, 0.4051],
+                ['HM', 0.2308, 2.3465, 1.3419, 106.459, 0.5562], ['HM', 0.5372, 2.171, 1.8759, 135.6919, 0.8562],
+                ['HM', 0.318, 2.1527, 1.1671, 130.0122, 0.9746], ['HM', 0.2434, 2.3092, 1.6817, 179.5259, 0.5633],
+                ['HM', 0.4191, 1.5634, 0.8894, 117.2704, 1.2626], ['HM', 0.5952, 2.6538, 1.5957, 152.4041, 0.5649],
+                ['HM', 0.3963, 2.0715, 1.2956, 124.8764, 0.4177], ['HM', 0.1638, 1.8827, 1.0938, 105.0277, 0.4157],
+                ['HM', 0.2752, 3.0803, 1.6789, 146.2936, 0.6697], ['HM', 0.4227, 1.6529, 0.8303, 84.3475, 0.4739]]
+    # decision tree training set
     # data_set = []
     # # Arthur Conan Doyle
     # data_set.append(process("lost_world.txt", "ACD"))
@@ -72,27 +73,30 @@ def file_main():
                 node = node.right
         if node.FINAL_LABEL == data_point[0]:
             correct_count += 1
-    # Perceptron classifier
-    processed_test_data.extend(copy.deepcopy(data_set))
-    for data_point in data_set:
-        if "ACD" in data_point[0]:
-            data_point[0] = 1
-        elif "HM" in data_point[0]:
-            data_point[0] = 0
-    for data_point in processed_test_data:
-        if "ACD" in data_point[0]:
-            data_point[0] = 1
-        elif "HM" in data_point[0]:
-            data_point[0] = 0
-    weights = pt.train_perceptron(processed_test_data, 0.01, 20000)
-    for data_point in processed_test_data:
-        total_count += 1
-        prediction = pt.predict(data_point, weights)
-        if data_point[0] == int(prediction):
-            correct_count += 1
-    print("Perceptron weights: " + str(weights))
+
+    # # Perceptron classifier
+    # processed_test_data.extend(copy.deepcopy(data_set))
+    # for data_point in data_set:
+    #     if "ACD" in data_point[0]:
+    #         data_point[0] = 1
+    #     elif "HM" in data_point[0]:
+    #         data_point[0] = 0
+    # for data_point in processed_test_data:
+    #     if "ACD" in data_point[0]:
+    #         data_point[0] = 1
+    #     elif "HM" in data_point[0]:
+    #         data_point[0] = 0
+    # weights = pt.train_perceptron(processed_test_data, 0.01, 20000)
+    # for data_point in processed_test_data:
+    #     total_count += 1
+    #     prediction = pt.predict(data_point, weights)
+    #     if data_point[0] == int(prediction):
+    #         correct_count += 1
+    # print("Perceptron weights: " + str(weights))
     print("Total correct: " + str((correct_count / total_count) * 100))
     print("done")
+    with open("model_decision_tree.pkl", "wb") as output:
+        pickle.dump(decision_tree, output, pickle.HIGHEST_PROTOCOL)
 
 
 def get_test_data(file, test_data):
@@ -110,3 +114,6 @@ def get_test_data(file, test_data):
             line = file.readline()
         data_point.data = text_data
         test_data.append(data_point)
+
+
+file_main()

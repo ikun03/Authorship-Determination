@@ -101,8 +101,8 @@ def process_string(dataset_row, book_text):
 
     dataset_row.append(round(mean_length_sentence / len(sorted_sentences), 4))
 
-    if "said" in word_dictionary.keys():
-        dataset_row.append(round(word_dictionary["said"] / line_count, 4))
+    if "-" in operand_dictionary.keys():
+        dataset_row.append(round(operand_dictionary["-"] / line_count, 4))
     else:
         dataset_row.append(0)
     return dataset_row
