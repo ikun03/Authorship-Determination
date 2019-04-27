@@ -1,3 +1,4 @@
+__author__ = "Kunal Shitut (ks6807)"
 import copy
 import pickle
 import sys
