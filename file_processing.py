@@ -105,4 +105,21 @@ def process_string(dataset_row, book_text):
         dataset_row.append(round(operand_dictionary["-"] / line_count, 4))
     else:
         dataset_row.append(0)
+
+    if "captain" in word_dictionary.keys():
+        dataset_row.append(round(word_dictionary["captain"] / line_count, 4))
+    else:
+        dataset_row.append(0)
+
+    if "holmes" in word_dictionary.keys():
+        dataset_row.append(round(word_dictionary["holmes"] / line_count, 4))
+    else:
+        dataset_row.append(0)
+
+    if "ship" in word_dictionary.keys():
+        dataset_row.append(round(word_dictionary["ship"] / line_count, 4))
+    else:
+        dataset_row.append(0)
+
+
     return dataset_row
