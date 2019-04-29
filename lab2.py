@@ -50,12 +50,41 @@ def main():
         # Train
         elif sys.argv[1] == "train":
             # Train your model
-            model = input("Which model would you like to train ? Perceptron(p) or Decision Tree(d): ")
-            if model != "p" and model != "d":
-                print("Sorry! Wrong argument")
-
             # Ask user if they want to use perceptron
-            elif model == "p":
+            if len(sys.argv) >= 3 and sys.argv[2] == "-d":
+                arg_index = 3
+
+                # Check if user has given depth
+                max_depth = 4
+                if sys.argv[3] == '-m':
+                    max_depth = int(sys.argv[4])
+                    arg_index += 2
+                entropy_cutoff = 0.0
+
+                # Check if user has given entropy
+                if sys.argv[3] == '-e':
+                    entropy_cutoff = float(sys.argv[4])
+                    arg_index += 2
+                elif sys.argv[5] == '-e':
+                    entropy_cutoff = float(sys.argv[6])
+                    arg_index += 2
+                # Training a decision tree
+                shuffle(data_set)
+                tree = dt.DecisionTree(data_set, ["ACD", "HM"], max_depth, entropy_cutoff)
+
+                filename = sys.argv[arg_index]
+                data_value = fp.process(filename, "NA")
+                node = tree.tree
+                while node.FINAL_LABEL == "":
+                    if data_value[node.att_index] <= node.threshold:
+                        node = node.left
+                    elif data_value[node.att_index] > node.threshold:
+                        node = node.right
+                if node.FINAL_LABEL == "ACD":
+                    print("Arthur Conan Doyle")
+                else:
+                    print("Herman Melville")
+            else:
                 perceptron_data = copy.deepcopy(data_set)
                 for data_point in perceptron_data:
                     if "ACD" in data_point[0]:
@@ -64,42 +93,13 @@ def main():
                         data_point[0] = 0
                 shuffle(perceptron_data)
                 weights = pt.train_perceptron(perceptron_data, 0.01, 20000)
-                predict = input("A perceptron has been trained. Would you like to make a prediction?(y/n) ")
-                if predict == "y":
-                    filename = input(
-                        "Please enter the name of the file containing text for author identification: ")
-                    data_value = fp.process(filename, "NA")
-                    prediction = pt.predict(data_value, weights)
-                    if int(prediction) == 1:
-                        print("Author is Arthur Conan Doyle.")
-                    elif int(prediction) == 0:
-                        print("Author is Herman Melville.")
-
-            # Or a decision tree
-            elif model == "d":
-                max_depth = int(input("Please enter the maximum depth of the decision tree: "))
-                entropy_cutoff = float(
-                    input("Please enter the entropy cutoff of the decision tree(ideal is 0.0): "))
-                print("Training a decision tree on training data...")
-                shuffle(data_set)
-                tree = dt.DecisionTree(data_set, ["ACD", "HM"], max_depth, entropy_cutoff)
-
-                predict = input("The decision tree has been trained. Would you like to make a prediction?(y/n) ")
-                if predict == "y":
-                    filename = input(
-                        "Please enter the name of the file containing text for author identification: ")
-                    data_value = fp.process(filename, "NA")
-
-                    node = tree.tree
-                    while node.FINAL_LABEL == "":
-                        if data_value[node.att_index] <= node.threshold:
-                            node = node.left
-                        elif data_value[node.att_index] > node.threshold:
-                            node = node.right
-                    if node.FINAL_LABEL == "ACD":
-                        print("The author is Arthur Conan Doyle")
-                    else:
-                        print("The author is Herman Melville")
+                filename = sys.argv[3]
+                data_value = fp.process(filename, "NA")
+                prediction = pt.predict(data_value, weights)
+                if int(prediction) == 1:
+                    print("Arthur Conan Doyle")
+                elif int(prediction) == 0:
+                    print("Herman Melville")
 
         # Use hard coded models for prediction
         elif sys.argv[1] == "predict":
@@ -117,14 +117,12 @@ def main():
                     elif file_data[node.att_index] > node.threshold:
                         node = node.right
                 if node.FINAL_LABEL == "ACD":
-                    print("The author is Arthur Conan Doyle")
+                    print("Arthur Conan Doyle")
                 else:
-                    print("The author is Herman Melville")
+                    print("Herman Melville")
             # Otherwise use a perceptron
             else:
                 filename = sys.argv[2]
-                print("Predicting using the hard-coded perceptron, to predict using the hard-coded decision tree use "
-                      "'predict -d filename' ")
                 model_file = open("model_perceptron.txt", "r")
                 line = model_file.readline().split(",")
                 weights = []
@@ -133,9 +131,9 @@ def main():
                 data_value = fp.process(filename, "NA")
                 prediction = pt.predict(data_value, weights)
                 if int(prediction) == 1:
-                    print("Author is Arthur Conan Doyle.")
+                    print("Arthur Conan Doyle")
                 elif int(prediction) == 0:
-                    print("Author is Herman Melville")
+                    print("Herman Melville")
 
     else:
         # Exit if no argument given
